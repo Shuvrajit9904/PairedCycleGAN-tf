@@ -14,7 +14,7 @@ from PIL import Image
 #from matplotlib import pyplot as plt
 
 
-filename = 'YMU/Makeup_YMU.mat'
+filename = 'data/YMU/Makeup_YMU.mat'
 
 data = sio.loadmat(filename)
 
@@ -24,14 +24,12 @@ image_name_mat = {}
 
 df = pd.DataFrame(image_matrix)
 
-
-
 for column_idx in df:
     flat_data = np.asarray(df[column_idx])
-    image_pixel = np.reshape(flat_data, (130, 150, 3))
+    image_pixel = np.reshape(flat_data, (150, 130, 3), order = "F")
     image_name_mat[image_file_names[0][column_idx][0]] = image_pixel
     img = Image.fromarray(image_pixel, 'RGB')
-    img.save('YMU/images/'+image_file_names[0][column_idx][0])
+    img.save('data/YMU/images/'+image_file_names[0][column_idx][0])
     
     
 
