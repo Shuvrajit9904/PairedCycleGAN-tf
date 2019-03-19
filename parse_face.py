@@ -64,28 +64,26 @@ rects = detector(gray, 1)
 
 
 for (i, rect) in enumerate(rects):
-	# determine the facial landmarks for the face region, then
-	# convert the landmark (x, y)-coordinates to a NumPy array
+
     shape = predictor(gray, rect)
     shape = face_utils.shape_to_np(shape)
  
-	# loop over the face parts individually
     for (name, idx_arr) in FACIAL_LANDMARKS_IDXS.items():
-		# clone the original image so we can draw on it, then
-		# display the name of the face part on the image
-        clone = image.copy()
-        cv2.putText(clone, name, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
-			0.7, (0, 0, 255), 2)
- 
-        for (x, y) in shape[idx_arr]:
-            cv2.circle(clone, (x, y), 1, (0, 0, 255), -1)
-    
+
+        clone = image.copy() 
 
         (x,y),radius = cv2.minEnclosingCircle(np.array([shape[idx_arr]]))  
         center = (int(x),int(y))  
         radius = int(radius) + 20   
-        roi = cv2.circle(clone,center,radius,(0,255,0),2)            
-        cv2.imshow("ROI", roi)
+        
+        mask = np.zeros(clone.shape, dtype=np.uint8)  
+        mask = cv2.circle(mask, center, radius, (255, 255, 255), -1, 8, 0)
+        
+        result_array = clone & mask
+        result_array = result_array[center[1] - radius:center[1] + radius,
+                            center[0] - radius:center[0] + radius, :]
+
+        cv2.imshow("ROI", result_array)
         cv2.waitKey(0)
     output = face_utils.visualize_facial_landmarks(image, shape)
     cv2.imshow("Image", output)
