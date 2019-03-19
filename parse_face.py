@@ -70,81 +70,82 @@ def parse_save(image, file,rects, predictor, FACIAL_LANDMARKS_IDXS, output_dir):
             mask = cv2.circle(mask, center, radius, (255, 255, 255), -1, 8, 0)
             
             result_array = clone & mask
-            print('shape, rad, center: ',result_array.shape, radius, center)
-            print("reach: ", center[1] - radius, center[1] + radius)
-            result_array = result_array[center[1] - radius:center[1] + radius,
-                                center[0] - radius:center[0] + radius, :]
-            print('2',result_array.shape)            
+            y_min = max(0, center[1] - radius)
+            x_min = max(0, center[0] - radius)
+            result_array = result_array[y_min:center[1] + radius,
+                                x_min:center[0] + radius, :]
+
             out_file_name = output_dir + out_file_init + '_'+ name + '.jpg'
             if name == 'right_eye_eyebrow':
-#                result_array = cv2.flip( result_array, 1 )
-                print(result_array.shape)
                 cv2.imwrite(out_file_name, cv2.flip( result_array, 1 ))
-#                cv2.imshow("ROI", result_array)
-#                cv2.waitKey(0)
     
             else:
-#                print('k',result_array.shape)                
-#                cv2.imwrite(out_file_name, result_array)
-                pass
+                cv2.imwrite(out_file_name, result_array)
+
             
     
 
-input_dir = './data/YMU/images/makeup_y/'
-output_dir = './data/YMU/images/makeup_y_parsed/'
+input_dir = './data/YMU/images/'
+#output_dir = './data/YMU/images/makeup_y_parsed/'
 all_files = os.listdir(input_dir)
 all_files.sort()
-for file in all_files:
+for file in all_files[1:]:
     input_file = input_dir + file
     image = cv2.imread(input_file)
     image = imutils.resize(image, width=500)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     
     rects = detector(gray, 1)
-
-#    parse_save(image, file,rects, predictor, FACIAL_LANDMARKS_IDXS, output_dir)
-    break
+    if file[6] == 'y':
+        output_dir = './data/YMU/images/makeup_y_parsed/'
+    elif file[6] == 'n':
+        output_dir = './data/YMU/images/makeup_n_parsed/'
+    else:
+        print(file)
+        break
+    parse_save(image, file,rects, predictor, FACIAL_LANDMARKS_IDXS, output_dir)
+#    break
 
 #
-#image = cv2.imread(args["image"])
-image = cv2.imread('./data/YMU/images/152_2_y.jpg')
-image = imutils.resize(image, width=500)
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-rects = detector(gray, 1)
-
-
-
-for (i, rect) in enumerate(rects):
-
-    shape = predictor(gray, rect)
-    shape = face_utils.shape_to_np(shape)
- 
-    for (name, idx_arr) in FACIAL_LANDMARKS_IDXS.items():
-
-        clone = image.copy() 
-
-        (x,y),radius = cv2.minEnclosingCircle(np.array([shape[idx_arr]]))  
-        center = (int(x),int(y))  
-        radius = int(radius) + 20   
-        
-        mask = np.zeros(clone.shape, dtype=np.uint8)  
-        mask = cv2.circle(mask, center, radius, (255, 255, 255), -1, 8, 0)
-        
-        result_array = clone & mask
-        result_array = result_array[center[1] - radius:center[1] + radius,
-                            center[0] - radius:center[0] + radius, :]
-        
-#        if name == 'right_eye_eyebrow':
-#            cv2.imshow("right_eye_eyebrow", cv2.flip( result_array, 1 ))
-#            cv2.waitKey(0)
+##image = cv2.imread(args["image"])
+#image = cv2.imread('./data/YMU/images/152_2_y.jpg')
+#image = imutils.resize(image, width=500)
+#gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 #
-#        else:
-#            cv2.imshow("ROI", result_array)
-#            cv2.waitKey(0)
-        cv2.imshow("ROI", result_array)
-        cv2.waitKey(0)
-        
-    output = face_utils.visualize_facial_landmarks(image, shape)
-    cv2.imshow("Image", output)
-    cv2.waitKey(0)
+#rects = detector(gray, 1)
+#
+#
+#
+#for (i, rect) in enumerate(rects):
+#
+#    shape = predictor(gray, rect)
+#    shape = face_utils.shape_to_np(shape)
+# 
+#    for (name, idx_arr) in FACIAL_LANDMARKS_IDXS.items():
+#
+#        clone = image.copy() 
+#
+#        (x,y),radius = cv2.minEnclosingCircle(np.array([shape[idx_arr]]))  
+#        center = (int(x),int(y))  
+#        radius = int(radius) + 20   
+#        
+#        mask = np.zeros(clone.shape, dtype=np.uint8)  
+#        mask = cv2.circle(mask, center, radius, (255, 255, 255), -1, 8, 0)
+#        
+#        result_array = clone & mask
+#        result_array = result_array[center[1] - radius:center[1] + radius,
+#                            center[0] - radius:center[0] + radius, :]
+#        
+##        if name == 'right_eye_eyebrow':
+##            cv2.imshow("right_eye_eyebrow", cv2.flip( result_array, 1 ))
+##            cv2.waitKey(0)
+##
+##        else:
+##            cv2.imshow("ROI", result_array)
+##            cv2.waitKey(0)
+#        cv2.imshow("ROI", result_array)
+#        cv2.waitKey(0)
+#        
+#    output = face_utils.visualize_facial_landmarks(image, shape)
+#    cv2.imshow("Image", output)
+#    cv2.waitKey(0)
