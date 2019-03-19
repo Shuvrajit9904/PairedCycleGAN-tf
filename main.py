@@ -63,20 +63,20 @@ class CycleGAN():
         self.image_A/self.image_B -> Input image with each values ranging from [-1,1]
         '''
 
-        filenames_A = tf.train.match_filenames_once("./input/horse2zebra/trainA/*.jpg")    
-        self.queue_length_A = tf.size(filenames_A)
-        filenames_B = tf.train.match_filenames_once("./input/horse2zebra/trainB/*.jpg")    
-        self.queue_length_B = tf.size(filenames_B)
+        filenames_n = tf.train.match_filenames_once("./data/YMU/images/makeup_n/*.jpg")    
+        self.queue_length_n = tf.size(filenames_n)
+        filenames_y = tf.train.match_filenames_once("./data/YMU/images/makeup_y/*.jpg")    
+        self.queue_length_y = tf.size(filenames_y)
         
-        filename_queue_A = tf.train.string_input_producer(filenames_A)
-        filename_queue_B = tf.train.string_input_producer(filenames_B)
+        filename_queue_n = tf.train.string_input_producer(filenames_n)
+        filename_queue_y = tf.train.string_input_producer(filenames_y)
 
         image_reader = tf.WholeFileReader()
-        _, image_file_A = image_reader.read(filename_queue_A)
-        _, image_file_B = image_reader.read(filename_queue_B)
+        _, image_file_n = image_reader.read(filename_queue_n)
+        _, image_file_y = image_reader.read(filename_queue_y)
 
-        self.image_A = tf.subtract(tf.div(tf.image.resize_images(tf.image.decode_jpeg(image_file_A),[256,256]),127.5),1)
-        self.image_B = tf.subtract(tf.div(tf.image.resize_images(tf.image.decode_jpeg(image_file_B),[256,256]),127.5),1)
+        self.image_n = tf.subtract(tf.div(tf.image.resize_images(tf.image.decode_jpeg(image_file_n),[512,512]),127.5),1)
+        self.image_y = tf.subtract(tf.div(tf.image.resize_images(tf.image.decode_jpeg(image_file_y),[512,512]),127.5),1)
 
     
 
